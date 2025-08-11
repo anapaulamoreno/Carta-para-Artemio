@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Night Thoughts 💌</title>
+  <style>
+    :root{
+      --bg1:#0f0c29;
+      --bg2:#302b63;
+      --bg3:#24243e;
+      --accent:#ff7ab6;
+      --text:#f8f8fb;
+      --paper:#fffaf5;
+      --ink:#382e2b;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 75% -20%, #ff7ab622 0%, #0000 60%),
+                  linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+      overflow:hidden;
+    }
+    #bg{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.55; filter: blur(.2px);}
+    .wrap{position:relative; z-index:2; min-height:100%; display:grid; place-items:center; padding:24px;}
+    .card{
+      width:min(920px, 92vw);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px) saturate(120%);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 4vw, 36px);
+      text-align:center;
+    }
+    .title{font-weight:800; font-size: clamp(28px, 4.4vw, 46px); margin: 6px 0 12px;}
+    .envelope{
+      --size: clamp(180px, 36vw, 260px);
+      width:var(--size); height:calc(var(--size) * .65);
+      margin: 16px auto 6px;
+      position:relative;
+      cursor:pointer;
+      transition: transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .envelope:hover{ transform: translateY(-2px) }
+    .env-body,.env-flap,.env-letter{position:absolute; border-radius:12px;}
+    .env-body{
+      inset:0;
+      background: linear-gradient(180deg,#ffd9ea,#ffc3dd);
+      border:2px solid #ffbad6;
+      z-index:1;
+    }
+    .env-flap{
+      inset:0;
+      transform-origin: top center;
+      clip-path: polygon(0 0, 100% 0, 50% 65%);
+      background: linear-gradient(180deg,#ff9ec6,#ff77b5);
+      border:2px solid #ff77b5; border-bottom:none;
+      transition: transform 1s cubic-bezier(.2,.8,.2,1);
+      z-index:3;
+    }
+    .heart-seal{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width: clamp(36px, 6vw, 54px); height: clamp(32px, 5.2vw, 46px);
+      background:var(--accent);
+      clip-path: path("M12 4c0-2.209 1.791-4 4-4 1.657 0 3.09 1.008 3.684 2.438C20.277 1.008 21.711 0 23.368 0c2.209 0 4 1.791 4 4 0 5.333-7.368 9.333-11.368 14C12.368 13.333 4 9.333 4 4c0-2.209 1.791-4 4-4 1.657 0 3.09 1.008 3.684 2.438C12.91 1.008 14.343 0 16 0c2.209 0 4 1.791 4 4z");
+      z-index:4;
+    }
+    .env-letter{
+      background: var(--paper);
+      border: 1px solid #ffe3d1;
+      width: 88%; height: 82%; left:6%; top:10%;
+      display:grid; place-items:center;
+      color:var(--ink);
+      font-weight:600;
+      font-size: clamp(14px, 2.6vw, 18px);
+    }
+    .envelope.open .env-flap{ transform: rotateX(170deg) }
+    dialog{border:none; padding:0; max-width:min(920px, 92vw); background:transparent;}
+    dialog::backdrop{background: rgba(0,0,20,.65);}
+    .letter{
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3.2vw, 28px);
+      border:1px solid #ffe3d1;
+      max-height: 82vh;
+      overflow:auto;
+    }
+    .letter p{margin-bottom:14px; line-height:1.65;}
+    .footer{display:flex; justify-content:flex-end; margin-top:12px;}
+    button{
+      background: var(--accent);
+      color: #1b0b12;
+      font-weight: 800;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <audio id="music" src="León Larregui - Brillas (Letra) [MzNduKt0ylU].mp3"></audio>
+
+  <div class="wrap">
+    <div class="card">
+      <h1 class="title">Night Thoughts</h1>
+      <div class="envelope" id="envelope">
+        <div class="env-body"></div>
+        <div class="env-flap">
+          <div class="heart-seal"></div>
+        </div>
+        <div class="env-letter">Tap to open 💌</div>
+      </div>
+      <div style="margin-top:18px;">
+        <button id="openBtn">Abrir carta</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="dlg">
+    <article class="letter" id="letterBody">
+      <!-- Texto de la carta -->
+      <p>Creo que el amor es eso… despertarme cada día y sentir que, aunque haya días fáciles y días que cuestan más, quiero seguir contigo. Que te elijo una y otra vez, aunque hayamos tenido desacuerdos y aunque a veces no entendamos todo de la misma manera. Para mí, amarte es esa elección diaria, no porque todo sea sencillo o ideal, sino porque contigo es donde quiero estar.</p>
+      <p>Siempre dicen que amar es bonito, y sí, lo es, pero pienso que amar es entendernos. Es mirarnos y saber si algo no está bien. Es tener paciencia cuando las palabras no salen o cuando los días se sienten pesados. Es escuchar lo que dices y lo que callas, y estar ahí sin necesitar una razón especial. Es conocer hasta las partes de ti que no siempre muestras, y no querer soltarte en ninguna de ellas.</p>
+      <p>Amar para mí también es sentirme libre de ser como soy contigo, sin miedo a que no me entiendas, sin sentir que tengo que cuidar cada palabra y poder mostrarte mis lados buenos, también los que a veces me cuestan aceptar, y saber que sigues aquí. Y quiero que tú sientas lo mismo conmigo, que este es un lugar donde puedes ser tú, con todo lo que eres, y saber que eso basta y sobra para mí.</p>
+      <p>Pienso que amar también es aprender juntos. Es ir descubriendo cosas del otro, cambiar lo que sea necesario, entender que no siempre tendremos todas las respuestas, pero que la disposición de seguir construyendo juntos ya lo es todo. Que habrá días tranquilos, días de risa, días intensos y días silenciosos… y que todos cuentan, porque en todos nos seguimos eligiendo.</p>
+      <p>Para mí, amar es abrirte la puerta de todo lo que soy, lo que me emociona, lo que me asusta, lo que me hace reír de verdad, mis fortalezas y mis debilidades. Es dejar que me conozcas a fondo, que me conozcas vulnerable, en las partes más buenas, pero también difíciles de mí y decidirás quedarte cuidando mi corazón como si fuera el tuyo. Y que sepas y confíes en que yo también cuidaré todo lo que me entregues. Porque en el fondo, el amor es eso, darnos el corazón y alma el uno al otro, sabiendo que lo que tenemos en las manos es valioso y que decides cada día cuidarlo y elegirlo a pesar de todo.</p>
+      <p>Amar es muchas cosas, cada una de ellas la he encontrado en ti, en cómo hemos crecido juntos, en las discusiones, en los besos, abrazos, en los te amo, en la paciencia y empatía que tenemos el uno con el otro todos los días. Amar es compartir tu vida con alguien que sepas que te apoyará en cada momento por más difícil que sea y decidirá quedarse para abrazarte y escucharte para salir adelante juntos. Amar es una decisión constante.</p>
+      <p>Y por todo eso, yo te elijo todos los días. Elijo confiar en nosotros, en lo que tenemos y en lo que estamos construyendo. Elijo creer en ti y en mí, y en que juntos, amándonos, podremos superar cada parte difícil y disfrutar cada momento de risas. Elijo mirarte y saber que aún con nuestras diferencias todo vale la pena. Porque el amor para mí no es solo un sentimiento, es una decisión… y la mía siempre será quedarme contigo. Te amo mi amor.</p>
+      <div class="footer">
+        <button id="closeBtn">Cerrar</button>
+      </div>
+    </article>
+  </dialog>
+
+  <script>
+    // Fondo corazones
+    (function(){
+      const c=document.getElementById('bg'),ctx=c.getContext('2d');
+      let w,h,hearts=[];
+      function resize(){
+        w=c.width=innerWidth;h=c.height=innerHeight;
+        hearts=Array.from({length:40},()=>({x:Math.random()*w,y:Math.random()*h,s:8+Math.random()*16,sp:.2+Math.random()*.7,a:.3+Math.random()*.5,r:Math.random()*Math.PI}));
+      }
+      function drawHeart(x,y,s,rot,a){
+        ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s/24,s/24);ctx.globalAlpha=a;
+        ctx.beginPath();ctx.moveTo(12,21);ctx.bezierCurveTo(10,19,3,15,3,9);
+        ctx.bezierCurveTo(3,5.5,5.7,3,8.8,3);ctx.bezierCurveTo(10.9,3,12.7,4.2,13.8,6);
+        ctx.bezierCurveTo(14.9,4.2,16.7,3,18.8,3);ctx.bezierCurveTo(22,3,24.7,5.5,24.7,9);
+        ctx.bezierCurveTo(24.7,15,17.5,19,15.4,21);ctx.closePath();
+        ctx.fillStyle='#ff9ac5';ctx.fill();ctx.restore();
+      }
+      function tick(){
+        ctx.clearRect(0,0,w,h);
+        hearts.forEach(hh=>{
+          hh.y+=hh.sp;hh.x+=Math.sin(hh.y/40)*.4;
+          if(hh.y>h+30){hh.y=-20;hh.x=Math.random()*w;}
+          drawHeart(hh.x,hh.y,hh.s,hh.r,hh.a);
+        });
+        requestAnimationFrame(tick);
+      }
+      addEventListener('resize',resize);resize();tick();
+    })();
+
+    const music=document.getElementById('music');
+    const envelope=document.getElementById('envelope');
+    const openBtn=document.getElementById('openBtn');
+    const dlg=document.getElementById('dlg');
+    const closeBtn=document.getElementById('closeBtn');
+
+    function openLetter(){
+      envelope.classList.add('open');
+      setTimeout(()=>{
+        dlg.showModal();
+        music.play().catch(()=>{});
+      },650);
+    }
+    envelope.addEventListener('click',openLetter);
+    openBtn.addEventListener('click',openLetter);
+    closeBtn.addEventListener('click',()=>{
+      dlg.close();
+      envelope.classList.remove('open');
+      music.pause();
+      music.currentTime=0;
+    });
+  </script>
+</body>
+</html>
